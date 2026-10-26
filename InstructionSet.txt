@@ -1,0 +1,17 @@
+Instructions:
+
+1) Arithemetic:
+   1)add      5)and
+   2)sub      6)nand
+   3)xor      7)addc
+   4)or
+
+2) Intermidiate Arithemetic:
+   1)addi      5)andi
+   2)subi      6)nandi
+   3)xori      7)addci
+   4)ori
+
+mv, mvi are also supported isntructions for the assembler but the assmebler simply converts mv, mvi into addi.
+
+there are 6 General purpose registers r2, re, r4, r5, r6, r7 and 2 special purpose registers r1 is PC/IP and r0 always outputs 0
