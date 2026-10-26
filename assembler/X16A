@@ -1,0 +1,103 @@
+#!/usr/bin/env python3
+
+import sys
+
+def assemble(filename, output):
+
+    keywords = {'mvi': ['mvi',0b0010], 'mv': ['mv', 0b0010],
+                'add': ['reg', 0b0001], 'sub': ['reg', 0b0001],
+                'xor': ['reg', 0b0001], 'or': ['reg', 0b0001],
+                'and': ['reg', 0b0001], 'nand': ['reg', 0b0001],
+                'addc': ['reg', 0b0001], 'cmp': ['reg', 0b0001],
+
+                'addi': ['int', 0b0010], 'subi': ['int', 0b0010],
+                'xori': ['int', 0b0010], 'ori': ['int', 0b0010],
+                'andi': ['int', 0b0010], 'nandi': ['int', 0b0010],
+                'addci': ['int', 0b0010], 'cmpi': ['int', 0b0010],
+                
+                'je': ['int', 0b0011], 'ja': ['int', 0b0011],
+                'jb': ['int', 0b0011], 'jz': ['int', 0b0011],
+                'jc': ['int', 0b0011], 'jne': ['int', 0b0011],
+                'jnz': ['int', 0b0011]}
+    instructions = {'mvi': 0b000, 'mv': 0b000,
+                    'add': 0b000, 'sub': 0b001,
+                    'xor': 0b010, 'or': 0b011,
+                    'and': 0b100, 'nand': 0b101,
+                    'addc': 0b110, 'cmp': 0b111,
+
+                    'addi': 0b000, 'subi': 0b001,
+                    'xori': 0b010, 'ori': 0b011,
+                    'andi': 0b100, 'nandi': 0b101,
+                    'addci': 0b110, 'cmpi': 0b111,
+                    
+                    'je': 0b000, 'ja': 0b001,
+                    'ja': 0b010, 'jb': 0b011,
+                    'jz': 0b100, 'jne': 0b101,
+                    'jnz': 0b110}
+    registers = {'r0': 0b0000, 'r1': 0b0001,
+                 'r2': 0b0010, 'r3': 0b0011,
+                 'r4': 0b0100, 'r5': 0b0101,
+                 'r6': 0b0110, 'r7': 0b111}
+
+    with open(filename, 'r') as file, open(output, 'w') as Fout:
+        data = file.read()
+
+        data = data.split('\n')
+
+        for ins in data:
+            
+            ins = ins.split(' ')
+            try:
+                opc = keywords.get(ins[0])[0]
+            except TypeError:
+                if ins[0] != '':
+                    print("Keyword dosen't exist: ", ins[0])
+                    opc = 'skip'
+                else:
+                    opc = 'newline'
+
+            match opc:
+                case 'int':
+                    BinIns = (0b10000000) | (instructions[ins[0]] << 4) | (keywords[ins[0]][1])
+                    BinIns = (BinIns << 8) | (registers[ins[1]] << 4) | (registers[ins[2]])
+                    opr = int(ins[3], 16)
+                    BinIns = (BinIns << 16) | (opr)
+                    Fout.write(hex(BinIns)[2:6]+'\n'+hex(BinIns)[6:10]+'\n')
+                case 'reg':
+                    BinIns = (0b00000000) | (instructions[ins[0]] << 4) | (keywords[ins[0]][1])
+                    BinIns = (BinIns << 8) | (registers[ins[1]] << 4) | (registers[ins[2]])
+                    Fout.write(f"{int(hex(BinIns)[2:], 16):04x}"+'\n')
+
+                case 'mvi':
+                    BinIns = (0b10000000) | (instructions[ins[0]] << 4) | (keywords[ins[0]][1])
+                    BinIns = (BinIns << 8) | (registers[ins[1]] << 4) | (0b0000)
+                    opr = int(ins[2], 16)
+                    BinIns = (BinIns << 16) | (opr)
+                    Fout.write(hex(BinIns)[2:6]+'\n'+hex(BinIns)[6:10]+'\n')
+
+                case 'mv':
+                        BinIns = (0b10000000) | (instructions[ins[0]] << 4) | (keywords[ins[0]][1])
+                        BinIns = (BinIns << 8) | (registers[ins[1]] << 4) | (registers[ins[2]])
+                        opr = int('0000', 16)
+                        BinIns = (BinIns << 16) | (opr)
+                        Fout.write(hex(BinIns)[2:6]+'\n'+hex(BinIns)[6:10]+'\n')
+                
+                case 'newline':
+                    continue
+
+def Hex2Bin(filename, output):
+    with open(filename, 'r') as fin, open(output, 'wb') as fout:
+        data = fin.read()
+
+        data = data.split('\n')
+        for i in data:
+            fout.write(bytes.fromhex(i))
+
+if __name__ == "__main__":
+    if len(sys.argv) < 3:
+        print("Error: No input output files")
+    else:
+        filename = sys.argv[1]
+        output = sys.argv[2]
+        assemble(filename, output.split('.')[0]+".hex")
+        Hex2Bin(output.split('.')[0]+".hex", output)
