@@ -1,0 +1,21 @@
+Instructions:
+
+    1. Register Arithemetic [opcode] [inputA/output] [inputB]
+
+        1.add
+        2.sub
+        3.xor
+        4.or
+        5.and
+        6.nand
+        7.addc
+    
+    1. Intermidiate Arithemetic [opcode] [output] [input] [intermidiate value]
+
+        1.addi
+        2.subi
+        3.xori
+        4.ori
+        5.andi
+        6.nandi
+        7.addci
