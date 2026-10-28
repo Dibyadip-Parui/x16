@@ -4,9 +4,9 @@ module CU(
     input wire [15:0] ins,
     input wire clk,
     input wire rst,
-    input wire cin,
 
     output wire [15:0] data,
+
     output wire [3:0] WR,
     output wire WR_EN,
     output wire [3:0] ALU1,
@@ -17,9 +17,7 @@ module CU(
     output wire [3:0] ALU,
     output wire ALU_EN,
     output wire IN_S,
-    output wire count,
-    output wire [15:0] debug,
-    output wire f
+    output wire count
     );
 
     wire [15:0] SVins; //This wire contains the saved instruction
@@ -31,9 +29,6 @@ module CU(
     //Initializing the wires
     assign InsLength = SVins[15];
     assign SubOp = SVins[14:12];
-
-    assign debug = SVins;
-    assign f = fetch;
 
     InsT int1 (.clk(~clk), .rst(rst), .f(fetch), .ex(extraCLK), .e(execute));
     Reg16$ ir (.in(ins), .sv(fetch), .clk(~clk), .rst(rst), .read(execute), .out(SVins));

@@ -1,67 +1,36 @@
-`timescale  1ns / 1ps
+//THIS FILE IS ONLY TO TEST THIS PROJECT AND IS NOT A PRT OF THIS PROJECT
+`timescale 10ps / 1ps
 
-module InsT(
-    input wire clk,
-    input wire rst,
-    output reg f,
-    output reg ex,
-    output reg e
-    );
-
-    always @(posedge clk) begin
-        if (f) begin
-            f = 1'b0;
-            ex = 1'b1;
-            e = 1'b0;
-        end
-        else if (ex) begin
-            f = 1'b0;
-            ex = 1'b0;
-            e = 1'b1;
-        end
-        else begin
-            f = 1'b1;
-            ex = 1'b0;
-            e = 1'b0;
-        end
-    end
-
-    always @(*) begin
-        if (rst) begin
-            f = 1'b1;
-            ex = 1'b0;
-            e = 1'b0;
-        end
-    end
-endmodule
-
+`include "cpu/cpu.v"
 
 module tb;
 
 reg clk;
 reg rst;
+wire [15:0] addr;
+wire [15:0] data;
 
-wire f, ex, e;
+rom rom1 (.clk(clk), .rst(rst), .addr(addr), .data(data));
+CPU cpu1 (.rst(rst), .clk(clk), .rom_data(data), .rom_addr(addr));
 
-InsT inst0 (.clk(clk), .rst(rst), .f(f), .ex(ex), .e(e));
-
+// Clock generation (20ns period)
 always begin
-#5 clk = ~clk;
+    #1 clk = ~clk;
 end
 
 initial begin
-    
-    rst = 1;
-    #5
-    rst = 0;
-    #5
+    // Initialize clock to prevent x-state propagation
     clk = 0;
-    #20 
-    $finish; 
-end
+    
+    $dumpfile("waveform.vcd");
+    $dumpvars(0, tb); // Dump all testbench and instance signals
 
-initial begin
-    $monitor("Time = %t clk = %b e=%b f=%b ex=%b", $time, clk, e, f, ex);
+    rst = 1;
+    #2;
+    rst = 0; // Release reset after one clock cycle
+    
+    #40;
+    $finish; 
 end
 
 endmodule
