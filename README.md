@@ -1,4 +1,5 @@
 Hello welcome to the x16 repo and thanks to visit my project
+I am a 12 year old boy form India trying to make CPUs
 
 This repository has some 16bit risc cpu that i designed in verilog along with its instruction set and a python assembler.
 
