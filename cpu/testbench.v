@@ -29,7 +29,7 @@ initial begin
     #2;
     rst = 0; // Release reset after one clock cycle
     
-    #40;
+    #100;
     $finish; 
 end
 

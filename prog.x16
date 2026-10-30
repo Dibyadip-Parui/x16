@@ -1,0 +1,10 @@
+mvi r2 0003
+mvi r3 0004
+addi r4 r2 0000
+add r4 r3
+
+mv r5 r4
+addi r4 r0 0003
+
+mvi r7 0004
+sub r1 r7

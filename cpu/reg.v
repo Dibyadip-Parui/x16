@@ -48,16 +48,15 @@ module Reg16$(
     );
     reg [15:0] r;
     always @(posedge clk) begin
-        if (sv) begin
+
+        if (rst) begin
+            r <= 16'b0;
+        end
+        else if (sv) begin
             r <= in;
         end
         else begin
             r <= r;
-        end
-    end
-    always @(*) begin
-        if (rst) begin
-            r <= 16'b0;
         end
     end
     assign out = r;
@@ -147,20 +146,22 @@ module counter(
     input wire read2,
     output reg [15:0] out1,
     output reg [15:0] out2
-    );
+);
+
+    // Sequential logic for the counter
     always @(posedge clk) begin
-        if (EN) begin
-            addr <= addr+1;
-        end
-    end
-    always @(*) begin
         if (rst) begin
-            addr = 16'b0;
+            addr <= 16'b0;
         end
-        if (jmp) begin
-            addr = a;
+        else if (jmp) begin
+            addr <= a;
+        end
+        else if (EN) begin
+            addr <= addr + 1;
         end
     end
+
+    // Combinational logic for read1 output (tri-state)
     always @(*) begin
         if (read1) begin
             out1 = addr;
@@ -169,6 +170,8 @@ module counter(
             out1 = 16'bz;
         end
     end
+
+    // Combinational logic for read2 output (tri-state)
     always @(*) begin
         if (read2) begin
             out2 = addr;
@@ -177,6 +180,7 @@ module counter(
             out2 = 16'bz;
         end
     end
+
 endmodule
 
 module DEC4B(

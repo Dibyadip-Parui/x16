@@ -16,8 +16,9 @@ module ALU16(
         if (EN) begin
             if (S==4'b0000) begin
                 {Cout, out} = a+b;
-            end else if (S==4'b0001) begin
-                {Cout, out} = a-b+Cin;
+            end 
+            else if (S==1) begin
+                out = a-b;
             end else if (S==4'b0010) begin
                 out = a^b;
             end else if (S==4'b0011) begin

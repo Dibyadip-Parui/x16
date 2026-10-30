@@ -65,7 +65,7 @@ module rom(
     output reg [15:0] data
 );
 
-    reg [15:0] rom_mem [0:32];
+    reg [15:0] rom_mem [0:16];
 
     // Load the hex file at simulation start
     initial begin
@@ -77,7 +77,6 @@ module rom(
         if (rst) begin
             data <= 16'h0000;
         end else begin
-            // Map the 16-bit address to the 4-entry ROM using lower 2 bits
             data <= rom_mem[addr[4:0]];
         end
     end
