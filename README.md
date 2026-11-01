@@ -7,17 +7,10 @@ TIPS to use the assembler:
 usage: X16A [input file] [output file]
 the assembler will also generate a .hex file that has simple human readable hex codes like 0122 and 8E20
 
-The prog.hex file has an example program that does the following
-mvi r2 0003
-mvi r3 0004
-addi r4 r2 0000
-add r4 r3
+The prog.hex file has an example program but it's not upto date it's recommended to use the assmebler to get a new program.hex the assmebler is in assmebler/X16A as a python script.
+it's used like PathOfX16A [input file] [output binary file name] the program also outputs a hex file that can be read by the testbench 
 
-mv r5 r4
-addi r4 r0 0003
-
-mvi r7 0004
-sub r1 r7
+the central cpu is in cpu/cpu.v and the testbench is in cpu/testbench.v
 
 The rom element in the cpu/cpu.v has been limited to 32words but can be increaed upto 65535 words.
 Thres is curently no IO in V2x16
