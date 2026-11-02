@@ -1,11 +1,12 @@
-`include "cpu/cu.v"
-`include "cpu/alu.v"
+`include "/mnt/home/User/Projects/x16/V2x16/cpu/alu.v" //Enter actual path
+`include "/mnt/home/User/Projects/x16/V2x16/cpu/cu.v" //Enter actual path
 
 module CPU(
     input wire rst,
     input wire clk,
     input wire [15:0] rom_data,
-    output wire [15:0] rom_addr
+    output wire [15:0] rom_addr,
+    output wire [15:0] gpo
 );
 
     wire [15:0] data; //Main data bus
@@ -36,7 +37,8 @@ module CPU(
                .WR(WR), .WR_EN(WR_EN), 
                .ALU1(ALU1), .ALU1_EN(ALU1_EN),
                .ALU2(ALU2), .ALU2_EN(ALU2_EN),
-               .out1(out1), .out2(out2)
+               .out1(out1), .out2(out2),
+               .gpo(gpo)
                );
 
     CU core1  (.clk(clk), .rst(rst), .ins(rom_data), .data(data),

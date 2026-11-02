@@ -15,7 +15,9 @@ module RegF(
 
     output wire [15:0] out1,
     output wire [15:0] out2,
-    output wire [15:0] addr
+    output wire [15:0] addr,
+    //This wire is for output and will be only until V4x16
+    output wire [15:0] gpo
     );
 
     wire [15:0] sv;
@@ -29,7 +31,7 @@ module RegF(
 
     Reg16_0 r0 (.in(in), .clk(clk), .rst(rst), .sv(sv[0]), .read1(a1[0]), .read2(a2[0]), .out1(out1), .out2(out2));
     counter r1 (.a(in), .rst(rst), .clk(clk), .EN(count), .addr(addr), .jmp(sv[1]), .read1(a1[1]), .read2(a2[1]), .out1(out1), .out2(out2));
-    Reg16 r2 (.in(in), .clk(clk), .rst(rst), .sv(sv[2]), .read1(a1[2]), .read2(a2[2]), .out1(out1), .out2(out2));
+    Reg16GPO r2 (.in(in), .clk(clk), .rst(rst), .sv(sv[2]), .read1(a1[2]), .read2(a2[2]), .out1(out1), .out2(out2), .gpo(gpo));
     Reg16 r3 (.in(in), .clk(clk), .rst(rst), .sv(sv[3]), .read1(a1[3]), .read2(a2[3]), .out1(out1), .out2(out2));
     Reg16 r4 (.in(in), .clk(clk), .rst(rst), .sv(sv[4]), .read1(a1[4]), .read2(a2[4]), .out1(out1), .out2(out2));
     Reg16 r5 (.in(in), .clk(clk), .rst(rst), .sv(sv[5]), .read1(a1[5]), .read2(a2[5]), .out1(out1), .out2(out2));
@@ -197,4 +199,48 @@ module DEC3B(
     output wire [7:0] out
     );
     assign out = EN ? (8'b1 << in) : 8'b0;
+endmodule
+
+module Reg16GPO(
+    input wire [15:0] in,
+    input wire sv,
+    input wire clk,
+    input wire rst,
+    input wire read1,
+    input wire read2,
+    output reg [15:0] out1,
+    output reg [15:0] out2,
+    output wire [15:0] gpo
+    );
+    reg [15:0] r;
+    assign gpo = r;
+    always @(posedge clk) begin
+        if (sv) begin
+            r <= in;
+        end
+        else begin
+            r <= r;
+        end
+    end
+    always @(*) begin
+        if (rst) begin
+            r <= 16'b0;
+        end
+    end
+    always @(*) begin
+        if (read1) begin
+            out1 = r;
+        end
+        else begin
+            out1 = 16'bz;
+        end
+    end
+    always @(*) begin
+        if (read2) begin
+            out2 = r;
+        end
+        else begin
+            out2 = 16'bz;
+        end
+    end
 endmodule

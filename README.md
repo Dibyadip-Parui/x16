@@ -20,6 +20,9 @@ sub r1 r7
 [NOTE: the intermidiate instruction take the intermidiate value as the first value]
 [For example subi r1 r2 0004 is r1=0004-r2 not r1=r2-0004]
 
+for current output testing i have a working general purpose output port like gpio but 
+only output it is conected to r2
+
 The cpu.v has the main module that are packed into functional cpu and require a rom to run as
 i dont know how to write a hardware rom in verilog.
 the main CPU module i in cpu/cpu.v and the testbench is in cpu/testbench.v
