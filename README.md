@@ -28,4 +28,8 @@ The assembler is a python script
 It is in assembler/X16A
 to use it you type [Path of the script] [input file] [output file]
 The assmebler alos produces a .hex file that the test bench can use
-Curently the rom module in testbench.v is limited but you can increase it as i dot know much aout testbench syntax yet.
+Curently the rom module in testbench.v is limited but you can increase it as i dot know much 
+about testbench syntax yet.
+
+[SPOILERS: I AM WORKING ON A V3x16 CPU THAT IS GOING TO BE TURNING COMPLETE AND HAVE 27 
+instructions]
