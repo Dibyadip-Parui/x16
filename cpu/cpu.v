@@ -55,29 +55,3 @@ module CPU(
     MUX16_2t1 mux1 (.a(data), .b(out1), .S(IN_S), .out(out1_p));
 
 endmodule
-
-
-//Ai generated i dont know about rom simulation in verilog
-module rom(
-    input wire clk,
-    input wire rst,
-    input wire [15:0] addr,
-    output reg [15:0] data
-);
-
-    reg [15:0] rom_mem [0:16];
-
-    // Load the hex file at simulation start
-    initial begin
-        $readmemh("prog.hex", rom_mem);
-    end
-
-    // Synchronous read with reset
-    always @(posedge clk) begin
-        if (rst) begin
-            data <= 16'h0000;
-        end else begin
-            data <= rom_mem[addr[4:0]];
-        end
-    end
-endmodule

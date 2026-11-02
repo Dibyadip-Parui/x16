@@ -1,19 +1,31 @@
-Hello welcome to the x16 repo and thanks to visit my project
-I am a 12 year old boy form India trying to make CPUs
+Hello and welcome to my x16 repo
+This branch is dedicated to the cpu V2x16
+V2x16 is a 16bit cpu whic uses a custom instruction set i developed
+It is not a V2x16 and is palned to be only have 14 arithemetic instructions 
+The instructions are info are in the InstructionSet file
 
-This repository has some 16bit risc cpu that i designed in verilog along with its instruction set and a python assembler.
+the prog.hex is a test program used by the testbench it contains the following program
 
-TIPS to use the assembler:
-usage: X16A [input file] [output file]
-the assembler will also generate a .hex file that has simple human readable hex codes like 0122 and 8E20
+mvi r2 0003
+mvi r3 0004
+addi r4 r2 0000
+add r4 r3
 
-The prog.hex file has an example program but it's not upto date it's recommended to use the assmebler to get a new program.hex the assmebler is in assmebler/X16A as a python script.
-it's used like PathOfX16A [input file] [output binary file name] the program also outputs a hex file that can be read by the testbench 
+mv r5 r4
+addi r4 r0 0003
 
-the central cpu is in cpu/cpu.v and the testbench is in cpu/testbench.v
+mvi r7 0004
+sub r1 r7
 
-The rom element in the cpu/cpu.v has been limited to 32words but can be increaed upto 65535 words.
-Thres is curently no IO in V2x16
-This is the latest version of V2x16 as i will make a new V3x16 for making em turning complete.
+[NOTE: the intermidiate instruction take the intermidiate value as the first value]
+[For example subi r1 r2 0004 is r1=0004-r2 not r1=r2-0004]
 
-But You can always note the bugs in V2x16 and inform me so that i can fix them
+The cpu.v has the main module that are packed into functional cpu and require a rom to run as
+i dont know how to write a hardware rom in verilog.
+the main CPU module i in cpu/cpu.v and the testbench is in cpu/testbench.v
+
+The assembler is a python script
+It is in assembler/X16A
+to use it you type [Path of the script] [input file] [output file]
+The assmebler alos produces a .hex file that the test bench can use
+Curently the rom module in testbench.v is limited but you can increase it as i dot know much aout testbench syntax yet.
