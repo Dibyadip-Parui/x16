@@ -1,4 +1,3 @@
-`include "/mnt/home/User/Projects/x16/V2x16/cpu/reg.v"
 
 module CU(
     input wire [15:0] ins,

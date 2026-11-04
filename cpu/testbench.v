@@ -1,60 +1,64 @@
-//THIS FILE IS ONLY TO TEST THIS PROJECT AND IS NOT A PART OF THIS PROJECT
-`timescale 1ns / 1ps
+`timescale 1ns/1ps
+
 `include "cpu/cpu.v"
+`include "cpu/alu.v"
+`include "cpu/reg.v"
+`include "cpu/cu.v"
 
-//Ai generated i dont know about rom simulation in verilog
-module rom(
-    input wire clk,
-    input wire rst,
-    input wire [15:0] addr,
-    output reg [15:0] data
-);
+module top;
+    reg clk = 0;
+    reg rst = 1;
+    wire [15:0] rom_addr;
+    wire [15:0] rom_data;
 
-    reg [15:0] rom_mem [0:16];
+    wire [15:0] gpo; //this wire is directly conected to r2 as a general purpose output
 
-    // Load the hex file at simulation start
+    CPU cpu (
+        .clk(clk),
+        .rst(rst),
+        .rom_addr(rom_addr),
+        .rom_data(rom_data),
+        .gpo(gpo)
+    );
+
+    rom16 rom (
+        .addr(rom_addr),
+        .data(rom_data)
+    );
+
+
+    //clock generation
+    always #5 clk = ~clk;
+
     initial begin
-        $readmemh("prog.hex", rom_mem);
+
+        $dumpfile("sim.vcd");
+        $dumpvars(0, top);
+
+        #20 rst = 0;
+        #500 $finish;
+    end
+    initial begin
+        $monitor("R2 = %h IP = %h time = %t", gpo, rom_addr, $time);
     end
 
-    // Synchronous read with reset
-    always @(posedge clk) begin
-        if (rst) begin
-            data <= 16'h0000;
-        end else begin
-            data <= rom_mem[addr[4:0]];
-        end
-    end
 endmodule
 
-module tb;
+module rom16 #(
+    parameter DEPTH = 65535,
+    parameter WIDTH = 16
+)(
+    input wire [15:0] addr,
+    output reg [WIDTH-1:0]data
+);
 
-reg clk;
-reg rst;
-wire [15:0] addr;
-wire [15:0] data;
-
-rom rom1 (.clk(clk), .rst(rst), .addr(addr), .data(data));
-CPU cpu1 (.rst(rst), .clk(clk), .rom_data(data), .rom_addr(addr));
-
-// Clock generation (20ns period)
-always begin
-    #1 clk = ~clk;
-end
+reg [WIDTH-1:0] mem [0:DEPTH];
 
 initial begin
-    // Initialize clock to prevent x-state propagation
-    clk = 0;
-    
-    $dumpfile("waveform.vcd");
-    $dumpvars(0, tb); // Dump all testbench and instance signals
-
-    rst = 1;
-    #2;
-    rst = 0; // Release reset after one clock cycle
-    
-    #100;
-    $finish; 
+    $readmemh("prog.hex", mem);
 end
 
+always @(*) begin
+data = mem[addr];
+end
 endmodule

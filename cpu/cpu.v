@@ -1,5 +1,3 @@
-`include "/mnt/home/User/Projects/x16/V2x16/cpu/alu.v" //Enter actual path
-`include "/mnt/home/User/Projects/x16/V2x16/cpu/cu.v" //Enter actual path
 
 module CPU(
     input wire rst,
