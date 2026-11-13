@@ -8,12 +8,10 @@ module RegF(
     input wire ALU1_EN,
     input wire [3:0] ALU2,
     input wire ALU2_EN,
-    input wire [15:0] Conda,
     
     input wire clk,
     input wire rst,
     input wire count,
-    input wire jmp,
 
     output wire [15:0] out1,
     output wire [15:0] out2,
@@ -32,7 +30,7 @@ module RegF(
     DEC4B dec3 (.in(ALU2), .EN(ALU2_EN), .out(a2));
 
     Reg16_0 r0 (.in(in), .clk(clk), .rst(rst), .sv(sv[0]), .read1(a1[0]), .read2(a2[0]), .out1(out1), .out2(out2));
-    counter r1 (.a(in), .rst(rst), .clk(clk), .EN(count), .addr(addr), .sv(sv[1]), .read1(a1[1]), .read2(a2[1]), .out1(out1), .out2(out2), .jmp(jmp), .Conda(Conda));
+    counter r1 (.a(in), .rst(rst), .clk(clk), .EN(count), .addr(addr), .jmp(sv[1]), .read1(a1[1]), .read2(a2[1]), .out1(out1), .out2(out2));
     Reg16GPO r2 (.in(in), .clk(clk), .rst(rst), .sv(sv[2]), .read1(a1[2]), .read2(a2[2]), .out1(out1), .out2(out2), .gpo(gpo));
     Reg16 r3 (.in(in), .clk(clk), .rst(rst), .sv(sv[3]), .read1(a1[3]), .read2(a2[3]), .out1(out1), .out2(out2));
     Reg16 r4 (.in(in), .clk(clk), .rst(rst), .sv(sv[4]), .read1(a1[4]), .read2(a2[4]), .out1(out1), .out2(out2));
@@ -140,9 +138,7 @@ endmodule
 
 module counter(
     input wire [15:0] a,
-    input wire [15:0] Conda,
     input wire jmp,
-    input wire sv,
     input wire rst,
     input wire clk,
     input wire EN,
@@ -159,11 +155,8 @@ module counter(
         if (rst) begin
             addr <= 16'b0;
         end
-        else if (sv) begin
-            addr <= a;
-        end
         else if (jmp) begin
-            addr <= Conda;
+            addr <= a;
         end
         else if (EN) begin
             addr <= addr + 1;

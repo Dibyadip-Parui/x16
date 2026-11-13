@@ -1,42 +1,14 @@
-// Test 1: Load values using hex immediates;
-addi r3 r0 000A;
-addi r4 r0 0005;
+addi r3 r0 4;
+addi r4 r0 5;
 
-// Test 2: Add registers together;
-add r3 r4;
+sub r3 r4;
 
-// Test 3: Subtraction and Not Equal check (r3 = r3 - 0005);
-subi r3 r3 0005;
-jne test_ja;
-addi r2 r0 00EE;
+addi r3 r0 5;
+addi r4 r0 4;
 
-lb test_ja;
-// Test 4: Above condition check;
-addi r5 r0 0020;
-addi r6 r0 0010;
-sub r5 r6;
-ja test_jb;
-addi r2 r0 00EE;
+sub r3 r4;
 
-lb test_jb;
-// Test 5: Below condition check;
-addi r5 r0 0005;
-addi r6 r0 000A;
-sub r5 r6;
-jb test_je;
-addi r2 r0 00EE;
+addi r3 r0 3;
+addi r4 r0 3;
 
-lb test_je;
-// Test 6: Zero and Equal condition check;
-addi r7 r0 0007;
-sub r7 r7;
-je test_success;
-addi r2 r0 00EE;
-
-lb test_success;
-// All tests passed successfully writing success code to GPIO r2;
-addi r2 r0 00AA;
-
-lb end;
-sub r0 r0;
-je end;
+sub r3 r4;

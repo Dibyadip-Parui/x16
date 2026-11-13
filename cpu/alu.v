@@ -3,6 +3,8 @@
 module ALU16(
     input wire [15:0] a,
     input wire [15:0] b,
+    input wire Cin,
+    input wire clk,
 
     input wire [3:0] S,
     input wire EN,
@@ -11,8 +13,8 @@ module ALU16(
     output reg Cout,
 
     output reg eq,
-    output reg ca,
-    output reg cb
+    output reg ab,
+    output reg be
     );
 
     always @(*) begin
@@ -22,26 +24,6 @@ module ALU16(
             end 
             else if (S==1) begin
                 out = a-b;
-                if (a==b) begin
-                    eq=1;
-                    ca=0;
-                    cb=0;
-                end
-                else if (a>b) begin
-                    eq=0;
-                    ca=1;
-                    cb=0;
-                end
-                else if (a<b) begin
-                    eq=0;
-                    ca=0;
-                    cb=1;
-                end
-                else begin
-                    eq = 0;
-                    ca = 0;
-                    cb = 0;
-                end
             end else if (S==4'b0010) begin
                 out = a^b;
             end else if (S==4'b0011) begin
@@ -51,9 +33,23 @@ module ALU16(
             end else if (S==4'b0101) begin
                 out = a~&b;
             end else if (S==4'b0110) begin
-                {Cout, out} = a+b+Cout;
+                {Cout, out} = a+b+Cin;
             end else if (S==4'b0111) begin
-                out = a >> b;
+                if (a==b) begin
+                    eq = 1;
+                    ab = 0;
+                    be = 0;
+                end
+                else if (a>b) begin
+                    eq = 0;
+                    ab = 1;
+                    be = 0;
+                end 
+                else begin
+                    eq = 0;
+                    ab = 0;
+                    be = 1;
+                end
             end
         end
         else begin
@@ -64,19 +60,23 @@ module ALU16(
 endmodule
 
 module MUX16_2t1(
-    input wire [15:0] a,
-    input wire [15:0] b,
-    input wire S,
+    input wire [15:0] out1,
+    input wire [15:0] out2,
+    input wire [15:0] data,
+    input wire IN_S,
 
-    output reg [15:0] out
+    output reg [15:0] aluIn1,
+    output reg [15:0] aluIn2
     );
 
     always @(*) begin
-        if (S) begin
-            out = a;
+        if (~IN_S) begin
+            aluIn1 = out1;
+            aluIn2 = out2;
         end
         else begin
-            out = b;
+            aluIn1 = out2;
+            aluIn2 = data;
         end
     end
 endmodule

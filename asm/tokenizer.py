@@ -1,59 +1,106 @@
-from sys import exit
+import sys
 
-def tokenize(data):
+def CleanData(data: str):
 
-    data = str.lower(data)
-    keywords = {"add":{"type":"ins.reg.add", "operands":2,"size":1},
-                "sub":{"type":"ins.reg.sub", "operands":2,"size":1},
-                "xor":{"type":"ins.reg.xor", "operands":2,"size":1},
-                "or":{"type":"ins.reg.or", "operands":2,"size":1},
-                "and":{"type":"ins.reg.and", "operands":2,"size":1},
-                "nand":{"type":"ins.reg.nand", "operands":2,"size":1},
-                "addc":{"type":"ins.reg.addc", "operands":2,"size":1},
+    #clearing the data and compresing down to instruction lines only
+    data = data.lower()
+    data = data.split(';')
+
+    CLdata = []
+
+    #Clearing out the \n
+    for i in range(len(data)):
+        data[i] = str.replace(data[i], '\n', '')
+    #Clearing out the empty strings ('')
+    for i in range(data.count('')):
+        data.remove('')
+    #Cleearing out comments and white or empty instructions
+    for i in data:
+        if str.startswith(i, '//'):
+            continue
+        elif str.startswith(i, ' '):
+            continue
+        else:
+            CLdata.append(i)
+
+    #Spliting the Instructions into indivisula list of opcode and operands
+    tmp = []
+    CL2data = []
+    for i in CLdata:
+        tmp = i.split(' ')
+        for i in range(tmp.count('')):
+            tmp.remove('')
+        CL2data.append(tmp)
+
+    return CL2data
+
+def tokenize(data: list):
+
+    #final Tokenization
+    keywords = {"add": {"type":"reg.add", "size":1, "operands": 2},
+                "sub": {"type":"reg.sub", "size":1, "operands": 2},
+                "xor": {"type":"reg.xor", "size":1, "operands": 2},
+                "or": {"type":"reg.or", "size":1, "operands": 2},
+                "and": {"type":"reg.and", "size":1, "operands": 2},
+                "nand": {"type":"reg.nand", "size":1, "operands": 2},
+                "addc": {"type":"reg.addc", "size":1, "operands": 2},
+                "cmp": {"type":"reg.cmp", "size":1, "operands": 2},
                 
-                "addi":{"type":"ins.int.addi", "operands":3,"size":2},
-                "subi":{"type":"ins.int.subi", "operands":3,"size":2},
-                "xori":{"type":"ins.int.xori", "operands":3,"size":2},
-                "ori":{"type":"ins.int.ori", "operands":3,"size":2},
-                "andi":{"type":"ins.int.andi", "operands":3,"size":2},
-                "nandi":{"type":"ins.int.nandi", "operands":3,"size":2},
-                "addci":{"type":"ins.int.addci", "operands":3,"size":2},
-                
-                "lb":{"type":"dir.lb", "operands":1, "size":0},
+                "addi": {"type":"int.addi", "size":2, "operands": 3},
+                "subi": {"type":"int.subi", "size":2, "operands": 3},
+                "xori": {"type":"int.xori", "size":2, "operands": 3},
+                "ori": {"type":"int.ori", "size":2, "operands": 3},
+                "andi": {"type":"int.andi", "size":2, "operands": 3},
+                "nandi": {"type":"int.nandi", "size":2, "operands": 3},
+                "addci": {"type":"int.addci", "size":2, "operands": 3},
+                "cmpi": {"type":"int.cmpi", "size":2, "operands": 3}}
 
-                "je":{"type":"ins.ci.je", "operands":1,"size":2},
-                "ja":{"type":"ins.ci.ja", "operands":1,"size":2},
-                "jb":{"type":"ins.ci.jb", "operands":1,"size":2},
-                "jne":{"type":"ins.ci.jne", "operands":1,"size":2},
-                "jc":{"type":"ins.ci.jc", "operands":1,"size":2},
-                
-                "//":{"type":"dir.cmt", "operands":2000, "size":0}
-                }
 
-    result=[]
-    addr = 0
-    data = data.split(";")
+    data = CleanData(data)
 
-    data = [text.replace("\n", "") for text in data]
+    tkdata = []
 
-    while 1:
+    for i in data:
         try:
-            data.remove('')
-        except ValueError:
-            break
-    
+            ins = keywords[i[0]]
+            op = ins['type'].split('.')[1]
+            opT = ins['type'].split('.')[0]
 
-    for i in data: 
-        i = i.split(' ')
-        while 1:
-            try:
-                i.remove('')
-            except:
-                break
-        cmd = i[0]
-        try:
-            result.append([keywords[cmd], addr])
-            addr += keywords[cmd]["size"]
+            match opT:
+
+                case "reg":
+
+                    if len(i) > ins["operands"]+1:
+                        sys.exit(f"Too many Operands for Instruction: {i}")
+                    elif len(i) < ins["operands"]+1:
+                        sys.exit(f"Too Less Operands for Instruction: {i}")
+                    
+                    tmp = {}
+                    tmp['ins'] = op
+                    tmp['opA'] = i[1]
+                    tmp['opB'] = i[2]
+                    tkdata.append(tmp)
+
+                case "int":
+
+                    if len(i) > ins["operands"]+1:
+                        sys.exit(f"Too many Operands for Instruction: {i}")
+                    elif len(i) < ins["operands"]+1:
+                        sys.exit(f"Too Less Operands for Instruction: {i}")
+                    
+                    tmp = {}
+                    tmp['ins'] = op
+                    tmp['opA'] = i[1]
+                    tmp['opB'] = i[2]
+                    tmp['opC'] = i[3]
+                    tkdata.append(tmp)
+
         except KeyError:
-            exit(f"Invalid Instruction: {cmd}")
-    return result
+            sys.exit(f"Invalid Instruction: {i}")
+
+    return tkdata
+
+
+with open("asm/prog.x16", 'r') as file:
+    data = file.read()
+    tokenize(data)

@@ -4,12 +4,6 @@ module CU(
     input wire clk,
     input wire rst,
 
-    input wire eq,
-    input wire ca,
-    input wire cb,
-
-    input wire carry,
-
     output wire [15:0] data,
 
     output wire [3:0] WR,
@@ -22,9 +16,7 @@ module CU(
     output wire [3:0] ALU,
     output wire ALU_EN,
     output wire IN_S,
-    output wire count,
-    output reg jmp,
-    output reg [15:0] Conda
+    output wire count
     );
 
     wire [15:0] SVins; //This wire contains the saved instruction
@@ -37,6 +29,7 @@ module CU(
     assign InsLength = SVins[15];
     assign SubOp = SVins[14:12];
 
+
     InsT int1 (.clk(~clk), .rst(rst), .f(fetch), .ex(extraCLK), .e(execute));
     Reg16$ ir (.in(ins), .sv(fetch), .clk(~clk), .rst(rst), .read(execute), .out(SVins));
 
@@ -44,7 +37,6 @@ module CU(
 
     //Assigning the ALU IO
     assign ALU = SubOp;
-    assign ALU[3] = 0;
     assign ALU_EN = MainOp[1] | MainOp[2];
 
     assign ALU1 = SVins[7:4];
@@ -62,60 +54,8 @@ module CU(
     //assigning the IN_S wire whic selects between data bus and output2 for ALU Input 2
     assign IN_S = MainOp[2];
 
-    always @(*) begin
-        if (MainOp[3] == 1) begin
-            if (SubOp == 0) begin
-                if (eq) begin
-                    Conda = ins;
-                    jmp = 1;
-                end
-                else begin
-                    Conda = 16'bz;
-                    jmp = 0;
-                end
-            end
-            else if (SubOp == 1) begin
-                if (ca) begin
-                    Conda = ins;
-                    jmp = 1;
-                end
-                else begin
-                    Conda = 16'bz;
-                    jmp = 0;
-                end
-            end
-            else if (SubOp == 2) begin
-                if (cb) begin
-                    Conda = ins;
-                    jmp = 1;
-                end
-                else begin
-                    Conda = 16'bz;
-                    jmp = 0;
-                end
-            end
-            else if (SubOp == 3) begin
-                if (~eq) begin
-                    Conda = ins;
-                    jmp = 1;
-                end
-                else begin
-                    Conda = 16'bz;
-                    jmp = 0;
-                end
-            end
-            else if (SubOp == 4) begin
-                if (carry) begin
-                    Conda = ins;
-                    jmp = 1;
-                end
-                else begin
-                    Conda = 16'bz;
-                    jmp = 0;
-                end
-            end
-        end
-    end
+    //assigning the data bus
+    EN16 en1 (.a(ins), .en(MainOp[2]), .out(data));
 
 endmodule
 
@@ -128,7 +68,14 @@ module InsT(
     );
 
     always @(posedge clk) begin
-        if (f) begin
+
+        if (rst) begin
+            f = 1'b0;
+            ex = 1'b0;
+            e = 1'b1;
+        end
+
+        else if (f) begin
             f = 1'b0;
             ex = 1'b1;
             e = 1'b0;
@@ -145,13 +92,6 @@ module InsT(
         end
     end
 
-    always @(*) begin
-        if (rst) begin
-            f = 1'b1;
-            ex = 1'b0;
-            e = 1'b0;
-        end
-    end
 endmodule
 
 module EN16(

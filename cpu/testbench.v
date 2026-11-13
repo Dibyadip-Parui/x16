@@ -44,18 +44,21 @@ module top;
 
 endmodule
 
-module rom16(
+module rom16 #(
+    parameter DEPTH = 256,
+    parameter WIDTH = 16
+)(
     input wire [15:0] addr,
-    output reg [15:0]data
+    output reg [WIDTH-1:0]data
 );
 
-reg [15:0] mem [0:256];
+reg [WIDTH-1:0] mem [0:DEPTH];
 
 initial begin
     $readmemh("asm/prog.hex", mem);
 end
 
 always @(*) begin
-    data = mem[addr];
+data = mem[addr];
 end
 endmodule
