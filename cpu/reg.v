@@ -1,6 +1,7 @@
 
 module RegF(
     input wire [15:0] in,
+    input wire [15:0] addr_in,
 
     input wire [3:0] WR,
     input wire WR_EN,
@@ -12,6 +13,7 @@ module RegF(
     input wire clk,
     input wire rst,
     input wire count,
+    input wire jmp,
 
     output wire [15:0] out1,
     output wire [15:0] out2,
@@ -29,14 +31,25 @@ module RegF(
     wire [15:0] a2;
     DEC4B dec3 (.in(ALU2), .EN(ALU2_EN), .out(a2));
 
+    reg [15:0] ip_in;
+
     Reg16_0 r0 (.in(in), .clk(clk), .rst(rst), .sv(sv[0]), .read1(a1[0]), .read2(a2[0]), .out1(out1), .out2(out2));
-    counter r1 (.a(in), .rst(rst), .clk(clk), .EN(count), .addr(addr), .jmp(sv[1]), .read1(a1[1]), .read2(a2[1]), .out1(out1), .out2(out2));
+    counter r1 (.a(ip_in), .rst(rst), .clk(clk), .EN(count), .addr(addr), .jmp(sv[1]|jmp), .read1(a1[1]), .read2(a2[1]), .out1(out1), .out2(out2));
     Reg16GPO r2 (.in(in), .clk(clk), .rst(rst), .sv(sv[2]), .read1(a1[2]), .read2(a2[2]), .out1(out1), .out2(out2), .gpo(gpo));
     Reg16 r3 (.in(in), .clk(clk), .rst(rst), .sv(sv[3]), .read1(a1[3]), .read2(a2[3]), .out1(out1), .out2(out2));
     Reg16 r4 (.in(in), .clk(clk), .rst(rst), .sv(sv[4]), .read1(a1[4]), .read2(a2[4]), .out1(out1), .out2(out2));
     Reg16 r5 (.in(in), .clk(clk), .rst(rst), .sv(sv[5]), .read1(a1[5]), .read2(a2[5]), .out1(out1), .out2(out2));
     Reg16 r6 (.in(in), .clk(clk), .rst(rst), .sv(sv[6]), .read1(a1[6]), .read2(a2[6]), .out1(out1), .out2(out2));
     Reg16 r7 (.in(in), .clk(clk), .rst(rst), .sv(sv[7]), .read1(a1[7]), .read2(a2[7]), .out1(out1), .out2(out2));
+
+    always @(*) begin
+        if (jmp) begin
+            ip_in = addr_in;
+        end
+        else begin
+            ip_in = in;
+        end
+    end
 
 endmodule
 

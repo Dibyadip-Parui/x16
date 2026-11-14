@@ -53,12 +53,24 @@ def tokenize(data: list):
                 "andi": {"type":"int.andi", "size":2, "operands": 3},
                 "nandi": {"type":"int.nandi", "size":2, "operands": 3},
                 "addci": {"type":"int.addci", "size":2, "operands": 3},
-                "cmpi": {"type":"int.cmpi", "size":2, "operands": 3}}
+                "cmpi": {"type":"int.cmpi", "size":2, "operands": 3},
+
+                "je": {"type":"jmp.je", "size":2, "operands": 1},
+                "ja": {"type":"jmp.ja", "size":2, "operands": 1},
+                "jb": {"type":"jmp.jb", "size":2, "operands": 1},
+                "jne": {"type":"jmp.jne", "size":2, "operands": 1},
+                "jc": {"type":"jmp.jc", "size":2, "operands": 1},
+
+                "mv": {"type": "mv.addi", "size":2, "operands": 2},
+                "mvi": {"type": "mvi.addi", "size":2, "operands": 2},
+                "lb" : {"type": "lb.lable", "size":0, "operands": 1}
+                }
 
 
     data = CleanData(data)
 
     tkdata = []
+    addr = 0
 
     for i in data:
         try:
@@ -95,12 +107,59 @@ def tokenize(data: list):
                     tmp['opC'] = i[3]
                     tkdata.append(tmp)
 
+                case "mvi":
+                    if len(i) > ins["operands"]+1:
+                        sys.exit(f"Too many Operands for Instruction: {i}")
+                    elif len(i) < ins["operands"]+1:
+                        sys.exit(f"Too Less Operands for Instruction: {i}")
+                    
+                    tmp = {}
+                    tmp['ins'] = op
+                    tmp['opA'] = i[1]
+                    tmp['opB'] = 'r0'
+                    tmp['opC'] = i[2]
+                    tkdata.append(tmp)
+                case "mv":
+                    if len(i) > ins["operands"]+1:
+                        sys.exit(f"Too many Operands for Instruction: {i}")
+                    elif len(i) < ins["operands"]+1:
+                        sys.exit(f"Too Less Operands for Instruction: {i}")
+                    
+                    tmp = {}
+                    tmp['ins'] = op
+                    tmp['opA'] = i[1]
+                    tmp['opB'] = i[2]
+                    tmp['opC'] = '0'
+                    tkdata.append(tmp)
+
+                case "jmp":
+                    if len(i) > ins["operands"]+1:
+                        sys.exit(f"Too many Operands for Instruction: {i}")
+                    elif len(i) < ins["operands"]+1:
+                        sys.exit(f"Too Less Operands for Instruction: {i}")
+                    
+                    tmp = {}
+                    tmp['ins'] = op
+                    tmp['opA'] = 'r0'
+                    tmp['opB'] = 'r0'
+                    tmp['opC'] = i[1]
+                    tkdata.append(tmp)
+
+                case "lb":
+                    if len(i) > ins["operands"]+1:
+                        sys.exit(f"Too many Operands for Instruction: {i}")
+                    elif len(i) < ins["operands"]+1:
+                        sys.exit(f"Too Less Operands for Instruction: {i}")
+
+                    tmp = {}
+                    tmp['ins'] = op
+                    tmp['name'] = i[1]
+                    tmp['addr'] = addr-1
+                    tkdata.append(tmp)                     
+
+            addr += (ins["size"])      
+
         except KeyError:
             sys.exit(f"Invalid Instruction: {i}")
 
     return tkdata
-
-
-with open("asm/prog.x16", 'r') as file:
-    data = file.read()
-    tokenize(data)

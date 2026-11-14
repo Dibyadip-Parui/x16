@@ -16,7 +16,13 @@ module CU(
     output wire [3:0] ALU,
     output wire ALU_EN,
     output wire IN_S,
-    output wire count
+    output wire count,
+    output reg jmp,
+
+    input wire eq,
+    input wire ab,
+    input wire be,
+    input wire carry
     );
 
     wire [15:0] SVins; //This wire contains the saved instruction
@@ -55,7 +61,34 @@ module CU(
     assign IN_S = MainOp[2];
 
     //assigning the data bus
-    EN16 en1 (.a(ins), .en(MainOp[2]), .out(data));
+    EN16 en1 (.a(ins), .en(MainOp[2] | MainOp[3]), 
+    .out(data));
+
+    always @(*) begin
+        if (MainOp[3]) begin
+            if ((SubOp == 3'b000)&eq) begin
+                jmp = 1;
+            end
+            else if ((SubOp == 3'b001)&ab) begin
+                jmp = 1;
+            end
+            else if ((SubOp == 3'b010)&be) begin
+                jmp = 1;
+            end
+            else if ((SubOp == 3'b011)&(~eq)) begin
+                jmp = 1;
+            end
+            else if ((SubOp == 3'b100)&carry) begin
+                jmp = 1;
+            end
+            else begin
+                jmp = 0;
+            end
+        end
+        else begin
+            jmp = 0;
+        end
+    end
 
 endmodule
 

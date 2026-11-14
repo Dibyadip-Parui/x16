@@ -17,6 +17,8 @@ module CPU(
     wire ALU1_EN;
     wire [3:0] ALU2;
     wire ALU2_EN;
+
+    wire jmp;
     
     wire [15:0] out1;
     wire [15:0] out2;
@@ -32,6 +34,9 @@ module CPU(
     wire Cout;
     reg wrEN;
     reg wrRen;
+    wire eq;
+    wire ab;
+    wire be;
 
     always @(*) begin
         if (wrEN) begin
@@ -43,26 +48,27 @@ module CPU(
     end
 
     RegF reg1 (.clk(clk), .rst(rst), .in(ALU_OUT), .addr(rom_addr), 
-               .count(count), 
+               .count(count), .addr_in(data), 
                .WR(WR), .WR_EN(wrRen), 
                .ALU1(ALU1), .ALU1_EN(ALU1_EN),
                .ALU2(ALU2), .ALU2_EN(ALU2_EN),
                .out1(out1), .out2(out2),
-               .gpo(gpo)
-               );
+               .gpo(gpo),
+               .jmp(jmp));
 
     CU core1  (.clk(clk), .rst(rst), .ins(rom_data), .data(data),
                .count(count), 
                .WR(WR), .WR_EN(WR_EN), 
                .ALU1(ALU1), .ALU1_EN(ALU1_EN),
                .ALU2(ALU2), .ALU2_EN(ALU2_EN),
-               .ALU(ALU), .ALU_EN(ALU_EN), .IN_S(IN_S)
+               .ALU(ALU), .ALU_EN(ALU_EN), .IN_S(IN_S),
+               .jmp(jmp), .eq(eq), .ab(ab), .be(be), .carry(Cout)
                );
 
     ALU16 alu1 (.a(aluIn1), .b(aluIn2), .Cin(Cin), 
                 .S(ALU), .EN(ALU_EN), .out(ALU_OUT),
-                .Cout(Cout), .clk(clk)
-                );
+                .Cout(Cout), .clk(clk),
+                .eq(eq), .ab(ab), .be(be));
 
     MUX16_2t1 mux1 (.out1(out1), .out2(out2),
                     .data(data), .IN_S(IN_S),
