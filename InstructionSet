@@ -17,3 +17,7 @@
     1)je    2)ja
     3)jb    4)jne
     5)jc
+
+4)Memory operation [reg (data)] [reg (address)]
+
+    1)ld    2)st
