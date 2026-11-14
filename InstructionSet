@@ -1,0 +1,19 @@
+1)arithematic [reg] [reg]
+
+    1)add  2)sub
+    3)xor  4)or
+    5)nand 6)and
+    7)addc 8)cmp
+
+2)arithematic [reg] [reg] [intermidiate value]
+
+    1)addi  2)subi
+    3)xori  4)ori
+    5)nandi 6)andi
+    7)addci 8)cmpi
+
+3)Conditional jump [intermidiate value]
+
+    1)je    2)ja
+    3)jb    4)jne
+    5)jc

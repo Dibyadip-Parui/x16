@@ -61,6 +61,10 @@ def tokenize(data: list):
                 "jne": {"type":"jmp.jne", "size":2, "operands": 1},
                 "jc": {"type":"jmp.jc", "size":2, "operands": 1},
 
+
+                "ld": {"type":"mem.ld", "size":1, "operands": 2},
+                "st": {"type":"mem.st", "size":1, "operands": 2},
+
                 "mv": {"type": "mv.addi", "size":2, "operands": 2},
                 "mvi": {"type": "mvi.addi", "size":2, "operands": 2},
                 "lb" : {"type": "lb.lable", "size":0, "operands": 1}
@@ -155,8 +159,18 @@ def tokenize(data: list):
                     tmp['ins'] = op
                     tmp['name'] = i[1]
                     tmp['addr'] = addr-1
-                    tkdata.append(tmp)                     
-
+                    tkdata.append(tmp) 
+                case "mem":                    
+                    if len(i) > ins["operands"]+1:
+                        sys.exit(f"Too many Operands for Instruction: {i}")
+                    elif len(i) < ins["operands"]+1:
+                        sys.exit(f"Too Less Operands for Instruction: {i}")
+                    
+                    tmp = {}
+                    tmp['ins'] = op
+                    tmp['opA'] = i[1]
+                    tmp['opB'] = i[2]
+                    tkdata.append(tmp)
             addr += (ins["size"])      
 
         except KeyError:

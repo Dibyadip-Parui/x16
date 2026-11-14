@@ -1,0 +1,7 @@
+add r0 r0;
+
+mvi r3 5;
+mvi r4 256;
+
+st r3 r4;
+ld r5 r4;

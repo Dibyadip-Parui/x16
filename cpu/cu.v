@@ -22,7 +22,10 @@ module CU(
     input wire eq,
     input wire ab,
     input wire be,
-    input wire carry
+    input wire carry,
+
+    output reg load,
+    output reg store
     );
 
     wire [15:0] SVins; //This wire contains the saved instruction
@@ -30,6 +33,9 @@ module CU(
     wire fetch, extraCLK, execute; //these wires hold the state of cpu
     wire [2:0] SubOp; //this wire has the sub opcode
     wire InsLength; //this wire has the instruction length
+
+    reg WR2;
+    reg RD2;
 
     //Initializing the wires
     assign InsLength = SVins[15];
@@ -46,13 +52,13 @@ module CU(
     assign ALU_EN = MainOp[1] | MainOp[2];
 
     assign ALU1 = SVins[7:4];
-    assign ALU1_EN = MainOp[1];
+    assign ALU1_EN = MainOp[1] | RD2;
 
     assign ALU2 = SVins[3:0];
-    assign ALU2_EN = MainOp[1] | MainOp[2];
+    assign ALU2_EN = MainOp[1] | MainOp[2] | MainOp[4];
 
     assign WR = SVins[7:4];
-    assign WR_EN = MainOp[1] | MainOp[2];
+    assign WR_EN = MainOp[1] | MainOp[2] | WR2;
 
     //assigning the count wire
     assign count = fetch | (extraCLK & InsLength);
@@ -64,6 +70,37 @@ module CU(
     EN16 en1 (.a(ins), .en(MainOp[2] | MainOp[3]), 
     .out(data));
 
+    //handeling load store
+    always @(*) begin
+        if (MainOp[4]) begin
+            if (SubOp == 0) begin
+                load = 1;
+                store = 0;
+                WR2 = 1;
+                RD2 = 0;
+            end
+            else if (SubOp == 1) begin
+                load = 0;
+                store = 1;
+                WR2 = 0;
+                RD2 = 1;
+            end
+            else begin
+                load = 0;
+                store = 0;
+                WR2 = 0;
+                RD2 = 0;
+            end
+        end
+        else begin
+            load = 0;
+            store = 0;
+            WR2 = 0;
+            RD2 = 0;
+        end
+    end
+
+    //handeling the conditional jumps
     always @(*) begin
         if (MainOp[3]) begin
             if ((SubOp == 3'b000)&eq) begin

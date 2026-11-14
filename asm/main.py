@@ -19,7 +19,10 @@ def assemble(filename, output):
 
                   "je": 0b0011, "ja": 0b0011,
                   "jb": 0b0011, "jne": 0b0011,
-                  "jc": 0b0011}
+                  "jc": 0b0011,
+                  
+                  "ld": 0b0100, "st": 0b0100
+                  }
         
         SubBinIns = {"add": 0b0000, "sub": 0b0001,
                      "xor": 0b0010, "or": 0b0011,
@@ -33,7 +36,10 @@ def assemble(filename, output):
 
                      "je": 0b1000, "ja": 0b1001,
                      "jb": 0b1010, "jne": 0b1011,
-                     "jc": 0b1100}
+                     "jc": 0b1100,
+
+                     "ld": 0b0000, "st": 0b0001
+                     }
 
         registers = {"r0": 0b0000, "r1": 0b0001,
                      "r2": 0b0010, "r3": 0b0011,
@@ -42,13 +48,18 @@ def assemble(filename, output):
 
         lables = {}
         tmp_data = data
-
-        for i in range(0, len(data)-1):
-            op = data[i]['ins']
+        i=0
+        while 1:
+            try:
+                op = data[i]['ins']
+            except IndexError:
+                break
 
             if (op == "lable"):
                 lb = tmp_data.pop(i)
                 lables[lb['name']] = lb['addr']
+            i += 1
+
         data = tmp_data
 
         for i in data:
